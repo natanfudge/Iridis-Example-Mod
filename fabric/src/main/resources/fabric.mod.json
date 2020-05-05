@@ -1,0 +1,36 @@
+{
+    "schemaVersion": 1,
+    "id": "ladder-example-mod",
+    "version": "${version}",
+
+    "name": "Ladder Example Mod",
+    "description": "Describe your mod!",
+    "authors": [
+        "Me!"
+    ],
+    "contact": {
+        "homepage": "https://github.com/natanfudge/Ladder-Example-Mod",
+        "sources": "https://github.com/natanfudge/Ladder-Example-Mod"
+    },
+
+    "license": "GPL3",
+    "icon": "assets/ladder-example-mod/icon.png",
+
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "example.ExampleFabricMod"
+        ]
+    },
+
+    "depends": {
+        "fabricloader": ">=0.4.0",
+        "fabric-api-base": "*",
+        "fabric-events-lifecycle-v0": "*",
+        "fabric-events-interaction-v0": "*",
+        "fabric-networking-v0": "*"
+    },
+    "mixins": [
+        "ladder-example-mod.mixins.json"
+    ]
+}
