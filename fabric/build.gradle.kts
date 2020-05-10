@@ -25,7 +25,7 @@ dependencies {
 
 
 configure<BasePluginConvention> {
-    archivesBaseName = "$archivesBaseName-mc$minecraftVersion"
+    archivesBaseName = "$archivesBaseName+$minecraftVersion"
 }
 
 tasks.named<Copy>("processResources") {

@@ -23,9 +23,6 @@ pluginManagement {
             if ("net.minecraftforge.gradle" == requested.id.id) {
                 useModule("net.minecraftforge.gradle:ForgeGradle:${requested.version}")
             }
-            if("org.spongepowered.mixin" == requested.id.id){
-                useModule("org.spongepowered:mixingradle:${requested.version}")
-            }
         }
     }
 }

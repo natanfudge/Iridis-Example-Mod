@@ -5,7 +5,6 @@ import net.minecraftforge.gradle.userdev.UserDevExtension
 plugins {
     java
     id("net.minecraftforge.gradle") version "3.0.170"
-    id("org.spongepowered.mixin") version "0.7-SNAPSHOT"
 }
 
 val minecraftVersion = "1.15.2"
@@ -26,8 +25,6 @@ dependencies {
     minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
     implementation(fg.deobf("io.github.ladder:ladder-impl-forge:1.0-SNAPSHOT"))
-
-    compile("org.spongepowered:mixin:0.8")
 }
 
 
