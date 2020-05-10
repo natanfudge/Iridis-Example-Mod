@@ -7,12 +7,10 @@ pluginManagement {
         }
 
         gradlePluginPortal()
+
     }
+
 
 }
 
 rootProject.name = "Ladder-Pure-Fabric-Example-Mod"
-
-include("common")
-include("fabric")
-include("forge")
