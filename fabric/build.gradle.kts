@@ -7,6 +7,10 @@ val minecraftVersion = "1.15.2"
 val yarnMappings = "1.15.2+build.14:v2"
 val loaderVersion = "0.7.8+build.189"
 
+repositories {
+    maven(url = "https://jitpack.io")
+}
+
 dependencies {
     compile(project(":common"))
 

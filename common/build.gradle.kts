@@ -40,7 +40,7 @@ fun copyFromCommon(dir: String, to: String) {
     FileUtils.copyDirectoryToDirectory(source, dest)
 }
 
-tasks.named("compileJava") {
+tasks.named("classes") {
     finalizedBy(moveSrc)
 }
 
