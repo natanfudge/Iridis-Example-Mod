@@ -7,7 +7,7 @@ plugins {
     id("net.minecraftforge.gradle") version "3.0.170"
 }
 
-fun prop(key : String) : String = project.property(key).toString()
+fun prop(key: String): String = project.property(key).toString()
 
 
 repositories {
@@ -20,7 +20,20 @@ dependencies {
     minecraft("net.minecraftforge:forge:${prop("minecraft_version")}-${prop("forge_version")}")
 
     implementation(fg.deobf("io.github.ladder:ladder-impl-forge:1.0-SNAPSHOT"))
+
 }
+
+
+
+//TODO: make this more incremental or find a way to not need this
+val moveCommonSourcesToForge = tasks.create<Copy>("moveCommonSourcesToForge"){
+    val fromDir = project(":common").tasks.compileJava.get().destinationDir.parentFile
+    val toDir = tasks.compileJava.get().destinationDir.parentFile
+    from(fromDir)
+    into(toDir)
+}
+
+tasks.classes.get().dependsOn(moveCommonSourcesToForge)
 
 
 configure<UserDevExtension> {

@@ -1,5 +1,6 @@
 package example;
 
+import net.minecraft.block.BaseBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
