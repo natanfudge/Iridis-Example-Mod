@@ -7,12 +7,7 @@ plugins {
     id("net.minecraftforge.gradle") version "3.0.170"
 }
 
-val minecraftVersion = "1.15.2"
-val nextMajorMinecraftVersion: String = minecraftVersion.split('.').let { (useless, major) ->
-    "$useless.${major.toInt() + 1}"
-}
-val mappingsMinecraftVersion = "1.15.1"
-val forgeVersion = "31.0.14"
+fun prop(key : String) : String = project.property(key).toString()
 
 
 repositories {
@@ -22,7 +17,7 @@ repositories {
 dependencies {
     compile(project(":common"))
 
-    minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
+    minecraft("net.minecraftforge:forge:${prop("minecraft_version")}-${prop("forge_version")}")
 
     implementation(fg.deobf("io.github.ladder:ladder-impl-forge:1.0-SNAPSHOT"))
 }
@@ -31,7 +26,7 @@ dependencies {
 configure<UserDevExtension> {
     mappings(mapOf(
             "channel" to "snapshot",
-            "version" to "20200201-$mappingsMinecraftVersion"
+            "version" to prop("mcp_version")
     ))
 
 
@@ -49,37 +44,4 @@ configure<UserDevExtension> {
     }
 
 }
-
-configure<BasePluginConvention> {
-    archivesBaseName = "$archivesBaseName-mc$minecraftVersion"
-}
-
-tasks.named<Copy>("processResources") {
-    // this will ensure that this task is redone when the versions change.
-    val properties = mapOf(
-            "version" to version,
-            "forgeVersion" to forgeVersion,
-            "minecraftVersion" to minecraftVersion,
-            "nextMajorMinecraftVersion" to nextMajorMinecraftVersion
-    )
-    properties.forEach { (key, value) ->
-        inputs.property(key, value)
-    }
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets["main"].resources.srcDirs) {
-        include("META-INF/mods.toml")
-
-        // replace version and mcversion
-        expand(properties)
-    }
-
-    // copy everything else except the mcmod.info
-    from(sourceSets["main"].resources.srcDirs) {
-        exclude("META-INF/mods.toml")
-    }
-
-    from(project(":common").tasks.named("processResources"))
-}
-
 
