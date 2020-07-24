@@ -1,10 +1,12 @@
 package example;
 
-import net.minecraft.block.IBlock;
-import net.minecraft.block.IMaterial;
+
+import v1_16_1.net.minecraft.block.IBlock;
+import v1_16_1.net.minecraft.block.IMaterial;
 
 public class ExampleBlocks {
 
-    public static final ExampleBlock EXAMPLE_BLOCK = new ExampleBlock(IBlock.Settings.of(IMaterial.METAL));
+    IMaterial mat = IMaterial.getMETAL();
+    public static final ExampleBlock EXAMPLE_BLOCK = new ExampleBlock(IBlock.Settings.of(IMaterial.getMETAL()));
 
 }

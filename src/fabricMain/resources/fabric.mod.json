@@ -1,20 +1,21 @@
 {
     "schemaVersion": 1,
-    "id": "ladder-example-mod",
+    "id": "${mod_id}",
     "version": "${version}",
 
-    "name": "Ladder Example Mod",
-    "description": "Describe your mod!",
+    "name": "${display_name}",
+    "description": "${description}",
     "authors": [
         "Me!"
     ],
     "contact": {
-        "homepage": "https://github.com/natanfudge/Ladder-Example-Mod",
-        "sources": "https://github.com/natanfudge/Ladder-Example-Mod"
+        "homepage": "${home_page}",
+        "sources": "${sources}",
+        "issues": "${issue_tracker}"
     },
 
-    "license": "GPL3",
-    "icon": "assets/ladder-example-mod/icon.png",
+    "license": "${license}",
+    "icon": "${logo}",
 
     "environment": "*",
     "entrypoints": {

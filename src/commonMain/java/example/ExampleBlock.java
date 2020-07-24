@@ -1,6 +1,6 @@
 package example;
 
-import net.minecraft.block.BaseBlock;
+import v1_16_1.net.minecraft.block.BaseBlock;
 
 public class ExampleBlock extends BaseBlock {
     public ExampleBlock(Settings settings) {
