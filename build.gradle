@@ -1,8 +1,14 @@
 plugins {
-    id("fabric-loom") version "0.4-SNAPSHOT"
+    id("fabric-loom") /*version "0.4-SNAPSHOT"*/
 }
 
+apply plugin: FebbGradle
 
+febb {
+    minecraftVersion = minecraft_version
+    yarnBuild = yarn_build
+    febbBuild = iridis_build
+}
 
 group = rootProject.group
 version = rootProject.version
@@ -19,7 +25,19 @@ repositories {
     maven { url = "https://dl.bintray.com/febb/maven" }
 }
 
-configurations.create("commonCompileOnly")
+//configurations.create("commonCompileOnly")
+
+sourceSets {
+    def common = create("commonMain") {
+//        compileClasspath += configurations.commonCompileOnly
+    }
+    create("fabricMain") {
+        compileClasspath += main.compileClasspath + common.output + common.compileClasspath
+//        compileClasspath += commonMain.compileClasspath + common.output
+        runtimeClasspath += main.runtimeClasspath + common.output
+    }
+
+}
 dependencies {
 
     minecraft("com.mojang:minecraft:$minecraft_version")
@@ -28,21 +46,14 @@ dependencies {
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    commonCompileOnly("io.github.febb:api:$minecraft_version+$yarn_build-$iridis_build:api")
-    commonCompileOnly("io.github.febb:api:$minecraft_version+$yarn_build-$iridis_build:api-sources")
+    commonMainCompileOnly("io.github.febb:api:$minecraft_version+$yarn_build-$iridis_build:api")
+    commonMainCompileOnly("io.github.febb:api:$minecraft_version+$yarn_build-$iridis_build:api-sources")
+    fabricMainCompileOnly("io.github.febb:api:$minecraft_version+$yarn_build-$iridis_build:api")
+    fabricMainCompileOnly("io.github.febb:api:$minecraft_version+$yarn_build-$iridis_build:api-sources")
     modRuntime("io.github.febb:api:$minecraft_version+$yarn_build-$iridis_build:impl-fabric")
 }
 
-sourceSets {
-    def common = create("commonMain") {
-        compileClasspath += configurations.commonCompileOnly
-    }
-    create("fabricMain") {
-        compileClasspath += main.compileClasspath + common.output
-        runtimeClasspath += main.runtimeClasspath + common.output
-    }
 
-}
 
 
 tasks.jar {
