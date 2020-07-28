@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import abstractor.AbstractionManifest
 import abstractor.AbstractionManifestSerializer
 import kotlinx.serialization.json.Json
@@ -10,10 +12,15 @@ import net.fabricmc.loom.api.processors.JarProcessor
 import net.fabricmc.loom.task.RemapJarTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.bundling.Jar
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.objectweb.asm.commons.Remapper
 import org.objectweb.asm.tree.ClassNode
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
+
 
 class FebbGradle : Plugin<Project> {
     override fun apply(project: Project) {
@@ -25,7 +32,33 @@ open class FebbGradleExtension {
     var minecraftVersion: String? = null
     var yarnBuild: String? = null
     var febbBuild: String? = null
+    internal var dependenciesAdded: Boolean = false
+
+    @JvmOverloads
+    fun addDependencies(project: Project, setMappings: Boolean = true) {
+        require(minecraftVersion != null && yarnBuild != null && febbBuild != null) {
+            "minecraftVersion, yarnBuild and febbBuild must be set BEFORE the addDependencies() call in the febb {} block."
+        }
+
+        project.repositories.maven {
+            //TODO: remove when we have jcenter
+            it.name = "F2BB Maven"
+            it.setUrl("https://dl.bintray.com/febb/maven")
+        }
+
+        operator fun String.invoke(notation: String) = project.dependencies.add(this, notation)
+
+        val path = "io.github.febb:api:$minecraftVersion+$yarnBuild-$febbBuild"
+        "commonMainCompileOnly"("$path:api")
+        "commonMainCompileOnly"("$path:api-sources")
+        "modRuntime"("$path:impl-fabric")
+        "minecraft"("com.mojang:minecraft:$minecraftVersion")
+        if (setMappings) "mappings"("net.fabricmc:yarn:$minecraftVersion+build.$yarnBuild:v2")
+
+        dependenciesAdded = true
+    }
 }
+
 
 private fun FebbGradleExtension.validate() {
     require(minecraftVersion != null) { "minecraftVersion must be set in a febb {} block!" }
@@ -39,31 +72,50 @@ interface ProjectContext {
 }
 
 inline fun <reified T> ProjectContext.getExtension(): T = project.extensions.getByType(T::class.java)
+fun ProjectContext.getSourceSets(): SourceSetContainer = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets
 
 private class InitProjectContext(override val project: Project) : ProjectContext {
 
     fun apply() {
-        val loom = getExtension<LoomGradleExtension>()
         val febb = project.extensions.create("febb", FebbGradleExtension::class.java)
-//        val devManifestConfig = project.configurations.maybeCreate("devManifest")
-//        val devManifestDep = project.dependencies.add("devManifest",
-//                "io.github.febb:api:${febb.minecraftVersion}+${febb.yarnBuild}-${febb.febbBuild}:api-sources"
-//        )!!
-//        devManifestDep.
+
+        addJarProcessor(febb)
+        addSourceSets()
+
+        project.afterEvaluate { AfterEvaluateContext(it, febb).afterEvaluate() }
+    }
+
+    private fun addJarProcessor(febb: FebbGradleExtension) {
+        val loom = getExtension<LoomGradleExtension>()
         loom.addProcessor(FebbJarProcessor(project, febb))
+    }
 
-        project.afterEvaluate { AfterEvaluateContext(it).afterEvaluate() }
+    private fun addSourceSets(): Unit = with(getSourceSets()) {
+        val commonMain = create("commonMain")
+        val main = getByName("main")
+        val fabricMain = create("fabricMain").apply {
+            compileClasspath += main.compileClasspath + commonMain.compileClasspath + commonMain.output
+            runtimeClasspath += main.runtimeClasspath + commonMain.output
+        }
 
+        project.tasks.withType(Jar::class.java) {
+            if (it.name == "jar") {
+                it.from(commonMain.output)
+                it.from(fabricMain.output)
+            }
+        }
+
+        project.tasks.withType(ProcessResources::class.java) {
+            if (it.name == fabricMain.processResourcesTaskName) {
+                it.from(commonMain.resources.srcDirs)
+            }
+        }
     }
 }
 
-private class AfterEvaluateContext(override val project: Project) : ProjectContext {
+private class AfterEvaluateContext(override val project: Project, private val febb: FebbGradleExtension) : ProjectContext {
     fun afterEvaluate() {
-//        with(getExtension<FebbGradleExtension>()){
-//            require(minecraftVersion != null) {"minecraftVersion must be set in a febb {} block!"}
-//            require(yarnBuild != null) {"yarnBuild must be set in a febb {} block!"}
-//            require(febbBuild != null) {"febbBuild must be set in a febb {} block!"}
-//        }
+        require(febb.dependenciesAdded) { "addDependencies(project) must be called at the end of the febb {} block!" }
     }
 }
 
