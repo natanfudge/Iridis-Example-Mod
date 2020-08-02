@@ -1,8 +1,7 @@
 plugins {
-    id("fabric-loom") /*version "0.4-SNAPSHOT"*/
+    id("fabric-loom") version "0.5.local"
+    id "io.github.febb.febbgradle" version "0.2.0"
 }
-
-apply plugin: FebbGradle
 
 febb {
     minecraftVersion = minecraft_version
